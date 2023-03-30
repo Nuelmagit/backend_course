@@ -1,0 +1,107 @@
+openapi: 3.0.0
+info:
+  version: 0.0.1
+  title: API
+  description: API
+servers:
+  - url: https://apis.nuelma.dev/operations
+    description: Production environment
+paths:
+  /operate:
+    options:
+      x-amazon-apigateway-integration:
+        $ref: '#/components/x-amazon-apigateway-integrations/cors'
+    post:
+      parameters:
+        - in: header
+          name: Authorization
+          schema:
+            type: string
+          required: true
+      x-amazon-apigateway-integration:
+        $ref: '#/components/x-amazon-apigateway-integrations/httpEndpoints'
+  /records:
+    get:
+      parameters:
+        - in: header
+          name: Authorization
+          schema:
+            type: string
+          required: true
+      x-amazon-apigateway-integration:
+        $ref: '#/components/x-amazon-apigateway-integrations/httpEndpoints'
+  /records/{id}:
+    options:
+      x-amazon-apigateway-integration:
+        $ref: '#/components/x-amazon-apigateway-integrations/cors'
+    get:
+      parameters:
+        - in: header
+          name: Authorization
+          schema:
+            type: string
+          required: true
+      x-amazon-apigateway-integration:
+        $ref: '#/components/x-amazon-apigateway-integrations/httpEndpoints'
+    delete:
+      parameters:
+        - in: header
+          name: Authorization
+          schema:
+            type: string
+          required: true
+      x-amazon-apigateway-integration:
+        $ref: '#/components/x-amazon-apigateway-integrations/httpEndpoints'
+  /user/login:
+    options:
+      x-amazon-apigateway-integration:
+        $ref: '#/components/x-amazon-apigateway-integrations/cors'
+    post:
+      x-amazon-apigateway-integration:
+        $ref: '#/components/x-amazon-apigateway-integrations/httpEndpoints'
+  /operationTypes:
+    get:
+      parameters:
+        - in: header
+          name: Authorization
+          schema:
+            type: string
+          required: true
+      x-amazon-apigateway-integration:
+        $ref: '#/components/x-amazon-apigateway-integrations/httpEndpoints'
+x-amazon-apigateway-cors:
+  allowOrigins:
+  - http://localhost:3000
+  - http://localhost:4000
+  - https://content.nuelmadev.com
+  - http://localhost:4200
+  allowCredentials: true
+  exposeHeaders:
+  - "*"
+  maxAge: 3600
+  allowMethods:
+  - GET
+  - OPTIONS
+  - POST
+  - PUT
+  - PATCH
+  - DELETE
+  allowHeaders:
+  - "*"
+
+components:
+  x-amazon-apigateway-integrations:
+    httpEndpoints:
+      type: AWS_PROXY
+      httpMethod: POST
+      uri:
+        Fn::Sub: arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${HttpEndpointsLambda.Arn}/invocations
+      passthroughBehaviour: "when_no_templates"
+      payloadFormatVersion: "2.0"
+    cors:
+      type: mock
+      requestTemplates:
+        application/json: |
+          {
+            "statusCode" : 200
+          }

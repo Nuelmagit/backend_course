@@ -1,0 +1,148 @@
+{
+  "AWSTemplateFormatVersion": "2010-09-09",
+  "Description": "Stack",
+  "Parameters": {
+    "HttpApiDomainName": {
+      "Description": "Api's domain name",
+      "Type": "String"
+    },
+    "DbConnection": {
+      "Description": "Database connection string",
+      "Type": "String"
+    },
+    "RandomApiKey": {
+      "Description": "Random API key",
+      "Type": "String"
+    },
+    "JwtSecret": {
+      "Description": "JWT secret",
+      "Type": "String"
+    }
+  },
+  "Resources": {
+    "HttpApi": {
+      "Type": "AWS::ApiGatewayV2::Api",
+      "Properties": {
+        "Body": {
+          "Fn::Transform": {
+            "Name": "AWS::Include",
+            "Parameters": {
+              "Location": "./operations.openapi.yaml"
+            }
+          }
+        }
+      }
+    },
+    "HttpApiAccessLogGroup": {
+      "Type": "AWS::Logs::LogGroup",
+      "Properties": {
+        "LogGroupName": "HttpApi",
+        "RetentionInDays": "120"
+      }
+    },
+    "HttpApiStage": {
+      "Type": "AWS::ApiGatewayV2::Stage",
+      "Properties": {
+        "ApiId": {
+          "Ref": "HttpApi"
+        },
+        "AutoDeploy": true,
+        "StageName": "main",
+        "AccessLogSettings": {
+          "DestinationArn": {
+            "Fn::GetAtt": [
+              "HttpApiAccessLogGroup",
+              "Arn"
+            ]
+          },
+          "Format": "{ \"requestId\":\"$context.requestId\", \"ip\": \"$context.identity.sourceIp\", \"requestTime\":\"$context.requestTime\", \"httpMethod\":\"$context.httpMethod\",\"routeKey\":\"$context.routeKey\", \"status\":\"$context.status\",\"protocol\":\"$context.protocol\", \"responseLength\":\"$context.responseLength\", \"error\": \"$context.error.responseType\" }"
+        }
+      }
+    },
+    "HttpApiDomainMapping": {
+      "Type": "AWS::ApiGatewayV2::ApiMapping",
+      "Properties": {
+        "ApiId": {
+          "Ref": "HttpApi"
+        },
+        "Stage": {
+          "Ref": "HttpApiStage"
+        },
+        "DomainName": {
+          "Ref": "HttpApiDomainName"
+        },
+        "ApiMappingKey": "operations"
+      }
+    },
+    "HttpEndpointsLambda": {
+      "Type": "AWS::Lambda::Function",
+      "Properties": {
+        "Handler": "./adapters/apigateway-entrypoint.index",
+        "Runtime": "nodejs14.x",
+        "Timeout": 300,
+        "MemorySize": 512,
+        "Role": {
+          "Fn::GetAtt": ["AppExecutionRole", "Arn"]
+        },
+        "Environment": {
+          "Variables": {
+            "DB_CONECTION": {
+              "Ref": "DbConnection"
+            },
+            "RANDOM_API_KEY": {
+              "Ref": "RandomApiKey"
+            },
+            "JWT_SECERT": {
+              "Ref": "JwtSecret"
+            }
+          }
+        }
+      }
+    },
+    "HttpEndpointsLambdaPermission": {
+      "Type": "AWS::Lambda::Permission",
+      "Properties": {
+        "FunctionName": {
+          "Fn::GetAtt": ["HttpEndpointsLambda", "Arn"]
+        },
+        "Action": "lambda:InvokeFunction",
+        "Principal": "apigateway.amazonaws.com",
+        "SourceArn": {
+          "Fn::Sub": "arn:aws:execute-api:${AWS::Region}:${AWS::AccountId}:${HttpApi}/*/*"
+        }
+      }
+    },
+    "AppExecutionRole": {
+      "Type": "AWS::IAM::Role",
+      "Properties": {
+        "AssumeRolePolicyDocument": {
+          "Version": "2012-10-17",
+          "Statement": [
+            {
+              "Effect": "Allow",
+              "Principal": {
+                "Service": ["lambda.amazonaws.com"]
+              },
+              "Action": "sts:AssumeRole"
+            }
+          ]
+        },
+        "Policies": [
+          {
+            "PolicyName": "allow-logs",
+            "PolicyDocument": {
+              "Version": "2012-10-17",
+              "Statement": [
+                {
+                  "Effect": "Allow",
+                  "Action": ["logs:*"],
+                  "Resource": "arn:aws:logs:*:*:*"
+                }
+              ]
+            }
+          }
+        ]
+      }
+    }
+  }
+}
