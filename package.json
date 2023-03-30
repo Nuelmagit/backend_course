@@ -43,12 +43,6 @@
     "mongoose": "^7.0.3",
     "uuid": "^9.0.0"
   },
-  "husky": {
-    "hooks": {
-      "pre-commit": "lint-staged",
-      "pre-push": "npm test"
-    }
-  },
   "lint-staged": {
     "*.js": "eslint --cache --fix"
   }
