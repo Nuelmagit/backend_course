@@ -27,6 +27,7 @@
     "chai": "^4.3.7",
     "copy-webpack-plugin": "^11.0.0",
     "eslint": "^8.37.0",
+    "husky": "^8.0.3",
     "mocha": "^10.2.0",
     "sinon": "^15.0.3",
     "webpack": "^5.76.3",
@@ -40,5 +41,14 @@
     "jsonwebtoken": "^9.0.0",
     "mongoose": "^7.0.3",
     "uuid": "^9.0.0"
+  },
+  "husky": {
+    "hooks": {
+      "pre-commit": "lint-staged",
+      "pre-push": "npm test"
+    }
+  },
+  "lint-staged": {
+    "*.js": "eslint --cache --fix"
   }
 }
