@@ -14,9 +14,9 @@ In the project folder run
 
 ```sh
 #This will initialize user and account
-DB_CONECTION="mongodb+srv://ecommerce:G5iyZAFMWJzCcJNJ@ecommerce.sbtwxrj.mongodb.net/ecommerce?retryWrites=true&w=majority" npx babel-node scripts/init-account-state.js
+DB_CONECTION="mongo-connection-string" npx babel-node scripts/init-account-state.js
 #This will initialize operation types
-DB_CONECTION="mongodb+srv://ecommerce:G5iyZAFMWJzCcJNJ@ecommerce.sbtwxrj.mongodb.net/ecommerce?retryWrites=true&w=majority" npx babel-node scripts/init-operation-types.js
+DB_CONECTION="mongo-connection-string" npx babel-node scripts/init-operation-types.js
 ```
 
 ## Deploy.
