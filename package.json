@@ -4,6 +4,7 @@
   "description": "",
   "main": "index.js",
   "scripts": {
+    "prepare": "husky install",
     "build": "webpack",
     "cf-package": "bash scripts/cf-package.sh",
     "predeploy": "npm run build && npm run cf-package",
