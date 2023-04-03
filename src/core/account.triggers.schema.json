@@ -1,0 +1,85 @@
+{
+    "$schema": "http://json-schema.org/draft-07/schema#",
+    "title": "Operations",
+    "oneOf": [
+      {
+        "$ref": "#/definitions/deleteOperation"
+      },
+      {
+        "$ref": "#/definitions/computeOperation"
+      }
+    ],
+    "definitions": {
+      "basicOperation": {
+        "type": "object",
+        "required": ["accountId", "operationTypeId", "values"],
+        "properties": {
+          "accountId" : { "type": "string" },
+          "operationTypeId": { "type": "string" },
+          "values": {
+            "type": "array", 
+            "items": {"type":"number"},
+            "minItems": 2
+          }
+        },
+        "additionalProperties": false
+      },
+      "uniqueValueOperation": {
+        "type": "object",
+        "required": ["accountId", "operationTypeId", "value"],
+        "properties": {
+          "accountId" : { "type": "string" },
+          "operationTypeId": { "type": "string" },
+          "value": {"type":"number"}
+        },
+        "additionalProperties": false
+      },
+      "noValueOperation": {
+        "type": "object",
+        "required": ["accountId", "operationTypeId"],
+        "properties": {
+          "accountId" : { "type": "string" },
+          "operationTypeId": { "type": "string" }
+        },
+        "additionalProperties": false
+      },
+      "deleteOperation": {
+        "type": "object",
+        "required": ["action", "payload"],
+        "properties":{
+          "action": {"const": "deleteOperation"},
+          "payload": {
+            "type": "object",
+            "required": ["accountId", "operationId"],
+            "properties": {
+              "accountId": {"type": "string"},
+              "operationId": {"type": "string"}
+            },
+            "additionalProperties": false
+          }
+        }
+      },
+      "computeOperation": {
+        "type": "object",
+        "required": ["action", "payload"],
+        "properties":{
+          "action": {"const": "computeOperation"},
+          "payload": {
+            "anyOf": [
+              {
+                "$ref": "#/definitions/basicOperation"
+              },
+              {
+                "$ref": "#/definitions/uniqueValueOperation"
+              },
+              {
+                "$ref": "#/definitions/noValueOperation"
+              }
+            ]
+          }
+        }
+      }
+    }
+  }
+  
+  

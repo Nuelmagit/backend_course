@@ -7,11 +7,11 @@ const recordModel = model('Record', Schema({
   accountId: {
     type: String
   },
-  operationTypeId: {
+  operationType: {
     type: String
   },
   cost: {
-    type: Number
+    type: String
   },
   date: {
     type: String
@@ -20,7 +20,7 @@ const recordModel = model('Record', Schema({
     type: String
   },
   balanceAfterOperation: {
-    type: Number
+    type: String
   },
   deleted: {
     type: Boolean
@@ -31,13 +31,30 @@ export const getRecord = id => recordModel.findById(id);
 
 export const setRecord = (id, payload) => recordModel.findByIdAndUpdate(id, { _id: id, ...payload }, { new: true, upsert: true });
 
-export const findRecords = (query = {}, page = 1, limit = 5) => Promise.resolve({ deleted: { $ne: true }, ...query, })
-  .then(query => Promise.all([
-    recordModel.count(query).then(count => Math.ceil(count / limit)),
-    recordModel.find(
-      query,
-      { _id: 1, operationTypeId: 1, cost: 1, date: 1, operationResult: 1, balanceAfterOperation: 1 },
-      { skip: (page - 1) * limit, limit }
+
+export const findRecords = (query = {}, page = 1, sortField, sortCriteria, limit = 5) => Promise.resolve({ deleted: { $ne: true }, ...query, })
+  .then(query => recordModel.count(query).then(count => Math.ceil(count / limit))
+    .then(totalPages => totalPages > 0 ? totalPages : 1)
+    .then(totalPages => ({
+      totalPages,
+      currentPage: page > totalPages
+        ? totalPages
+        : page < 1
+        ? 1
+        : page
+    }))
+    .then(({ totalPages, currentPage }) => recordModel
+      .find(
+        query,
+        { _id: 1, operationType: 1, cost: 1, date: 1, operationResult: 1, balanceAfterOperation: 1 },
+        { skip: (currentPage - 1) * limit, limit }
+      ).sort([
+        [
+          recordModel.schema.paths[sortField] ? sortField : "date",
+          ["asc", "desc"].includes(sortCriteria) ? sortCriteria : "desc"
+        ]
+      ]).then(rows => ({ totalPages, currentPage, rows }))
     )
-  ]))
-  .then(([totalPages, rows]) => ({ totalPages: totalPages > 0 ? totalPages : 1, rows }))
+
+  )
+

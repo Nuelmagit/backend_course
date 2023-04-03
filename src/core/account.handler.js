@@ -28,7 +28,7 @@ const handlers = {
           ? invalidCommand("Operation type does not exist", { operationId: payload.operationTypeId })
           : operation.cost > state.balance
           ? invalidCommand("Insufficient balance", { cost: operation.cost, balance: state.balance })
-          : getOperationExecutor(getRandomString)[operation.type](payload.values)
+          : getOperationExecutor(getRandomString)[operation.type](payload.values || payload.value)
             .then(operationResult => [{
               eventName: "operationComputed",
               payload: {

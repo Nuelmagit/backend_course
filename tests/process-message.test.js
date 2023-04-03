@@ -2,6 +2,7 @@ import { expect } from "chai";
 import sinon from "sinon";
 import { processMessage } from "../src/utils/message-processor";
 
+const messageValidator = sinon.fake(message => message);
 const deduceInstancesStub = sinon.stub();
 const computeStateStub = sinon.stub();
 const handleMessageStub = sinon.stub();
@@ -16,6 +17,7 @@ const message = {
 const event = { eventName: "event1", payload: { prop1: "p1" } };
 
 const processMessageUnderTest = processMessage(
+  messageValidator,
   deduceInstancesStub,
   computeStateStub,
   handleMessageStub,

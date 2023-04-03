@@ -7,7 +7,8 @@ const errorCodeMap = {
   BadRequest: 400,
   Conflict: 409,
   NotFound: 404,
-  Forbidden: 403
+  Forbidden: 403,
+  Unauthorized: 401
 };
 
 export const jsonApiResponse = (results, statusCode = 200) => ({

@@ -8,7 +8,7 @@ export const recordProjector = (setRecord) => ({
     operationComputed: () =>
       setRecord(payload.operationId, {
         accountId: payload.accountId,
-        operationTypeId: payload.operationTypeId,
+        operationType: payload.operationTypeId,
         cost: payload.operationCost,
         date: payload.date,
         operationResult: payload.operationResult,

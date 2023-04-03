@@ -19,6 +19,6 @@ const user = {
 }
 
 connect()
-  .then(() => setState("abc", initialState))
+  .then(() => setState("acc-1", initialState))
   .then(() => setUser("user-1", user))
   .then(() => disconnect())

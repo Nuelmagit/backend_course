@@ -6,7 +6,7 @@ import { listOperationType } from "./database/views/operation-type";
 
 const isAuthorized = token => verifyToken(token)
   .catch(error => {
-    throw makeError("Forbidden", "No permissions found")
+    throw makeError("Unauthorized", "No permissions found")
   })
 
 const extractRecordProjectorResult = response => response
@@ -20,7 +20,8 @@ export const computeOperation = (pathArgs, queryStringArgs, body, authData) =>
       payload: {
         accountId: user.accountId,
         operationTypeId: body.operationTypeId,
-        values: body.values
+        ...(body.values ? { values: body.values } : {}),
+        ...(body.value ? { value: body.value } : {})
       }
     }))
     .then(extractRecordProjectorResult)
@@ -36,21 +37,41 @@ export const deleteOperation = (pathArgs, queryStringArgs, body, authData) =>
     }))
     .then(() => ({ deleted: true }))
 
+const getSearchQuery = search => {
+  if (!search) return;
+  const regExp = new RegExp(`^${search}`);
+  return {
+    $or: [
+      { operationType: regExp },
+      { cost: regExp },
+      { date: regExp },
+      { operationResult: regExp },
+      { balanceAfterOperation: regExp },
+    ]
+  };
+}
+
+const sanatizeNumber = number => isNaN(number) ? 1 : Number(number);
+
 export const paginateRecords = (pathArgs, queryStringArgs, body, authData) =>
   isAuthorized(authData?.token)
     .then(user => findRecords(
       {
-        accountId: user.accountId,
-        ...(queryStringArgs.operationTypeId ? { operationTypeId: new RegExp(`^${queryStringArgs.operationTypeId}`) } : {})
+        $and: [
+          { accountId: user.accountId },
+          ...queryStringArgs?.search ? [getSearchQuery(queryStringArgs.search)] : []
+        ]
       },
-      queryStringArgs.page || 1
+      queryStringArgs?.page ? sanatizeNumber(queryStringArgs?.page) : 1,
+      queryStringArgs?.sortField,
+      queryStringArgs?.sortCriteria
     ))
 
 export const login = (pathArgs, queryStringArgs, body) => !body.username || !body.password
   ? Promise.reject(makeError("BadRequest", "No credentials found"))
   : loginUser(body.username, body.password)
     .catch(err =>
-      Promise.reject(makeError("BadRequest", "Invalid credenrials"))
+      Promise.reject(makeError("BadRequest", "Invalid credentials"))
     )
 
 export const listOperationTypes = (pathArgs, queryStringArgs, body, authData) =>

@@ -44,9 +44,9 @@ export const index = async awsEvent => {
     : matches("DELETE /records/{id}")
     ? adaptRequest(deleteOperation, awsEvent, true)
     : matches("GET /records")
-    ? adaptRequest(paginateRecords, awsEvent)
+    ? adaptRequest(paginateRecords, awsEvent, true)
     : matches("GET /operationTypes")
-    ? adaptRequest(listOperationTypes, awsEvent)
+    ? adaptRequest(listOperationTypes, awsEvent, true)
     : matches("POST /user/login")
     ? adaptRequest(login, awsEvent)
     : Promise.reject(

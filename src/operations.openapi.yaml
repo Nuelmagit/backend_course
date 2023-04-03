@@ -4,13 +4,10 @@ info:
   title: API
   description: API
 servers:
-  - url: https://apis.nuelma.dev/operations
+  - url: https://tn-apis.nuelma.dev/v1/operations
     description: Production environment
 paths:
   /operate:
-    options:
-      x-amazon-apigateway-integration:
-        $ref: '#/components/x-amazon-apigateway-integrations/cors'
     post:
       parameters:
         - in: header
@@ -31,9 +28,6 @@ paths:
       x-amazon-apigateway-integration:
         $ref: '#/components/x-amazon-apigateway-integrations/httpEndpoints'
   /records/{id}:
-    options:
-      x-amazon-apigateway-integration:
-        $ref: '#/components/x-amazon-apigateway-integrations/cors'
     get:
       parameters:
         - in: header
@@ -53,10 +47,19 @@ paths:
       x-amazon-apigateway-integration:
         $ref: '#/components/x-amazon-apigateway-integrations/httpEndpoints'
   /user/login:
-    options:
-      x-amazon-apigateway-integration:
-        $ref: '#/components/x-amazon-apigateway-integrations/cors'
     post:
+      responses:
+        '200':
+          headers:
+            Access-Control-Allow-Origin:
+              schema:
+                type: string
+            Access-Control-Allow-Methods:
+              schema:
+                type: string
+            Access-Control-Allow-Headers:
+              schema:
+                type: string
       x-amazon-apigateway-integration:
         $ref: '#/components/x-amazon-apigateway-integrations/httpEndpoints'
   /operationTypes:
@@ -73,8 +76,12 @@ x-amazon-apigateway-cors:
   allowOrigins:
   - http://localhost:3000
   - http://localhost:4000
-  - https://content.nuelmadev.com
   - http://localhost:4200
+  - http://localhost:8080
+  - http://localhost:8081
+  - http://localhost:8082
+  - https://tn-front.nuelma.dev
+  - https://d35k4gzl350kd7.cloudfront.net
   allowCredentials: true
   exposeHeaders:
   - "*"
@@ -98,10 +105,12 @@ components:
         Fn::Sub: arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${HttpEndpointsLambda.Arn}/invocations
       passthroughBehaviour: "when_no_templates"
       payloadFormatVersion: "2.0"
-    cors:
-      type: mock
-      requestTemplates:
-        application/json: |
-          {
-            "statusCode" : 200
-          }
+      default:
+        statusCode: "200"
+        responseParameters:
+          method.response.header.Access-Control-Allow-Headers: '''Content-Type,X-Amz-Date,Authorization,X-Api-Key'''
+          method.response.header.Access-Control-Allow-Methods: '''*'''
+          method.response.header.Access-Control-Allow-Origin: '''*'''
+        responseTemplates:
+          application/json: |
+            {}

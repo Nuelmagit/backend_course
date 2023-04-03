@@ -17,9 +17,33 @@
     "JwtSecret": {
       "Description": "JWT secret",
       "Type": "String"
+    },
+    "CertificateArn": {
+      "Description": "Certificate's ARN",
+      "Type": "String"
+    },
+    "ApiMapping": {
+      "Description": "Custom domain name's path",
+      "Type": "String"
     }
   },
   "Resources": {
+    "APIDomainName": {
+      "Type": "AWS::ApiGatewayV2::DomainName",
+      "Properties": {
+        "DomainName": {
+          "Ref": "HttpApiDomainName"
+        },
+        "DomainNameConfigurations": [
+          {
+            "EndpointType": "REGIONAL",
+            "CertificateArn": {
+              "Ref": "CertificateArn"
+            }
+          }
+        ]
+      }
+    },
     "HttpApi": {
       "Type": "AWS::ApiGatewayV2::Api",
       "Properties": {
@@ -71,7 +95,9 @@
         "DomainName": {
           "Ref": "HttpApiDomainName"
         },
-        "ApiMappingKey": "operations"
+        "ApiMappingKey": {
+          "Ref": "ApiMapping"
+        }
       }
     },
     "HttpEndpointsLambda": {
@@ -82,7 +108,10 @@
         "Timeout": 300,
         "MemorySize": 512,
         "Role": {
-          "Fn::GetAtt": ["AppExecutionRole", "Arn"]
+          "Fn::GetAtt": [
+            "AppExecutionRole",
+            "Arn"
+          ]
         },
         "Environment": {
           "Variables": {
@@ -103,7 +132,10 @@
       "Type": "AWS::Lambda::Permission",
       "Properties": {
         "FunctionName": {
-          "Fn::GetAtt": ["HttpEndpointsLambda", "Arn"]
+          "Fn::GetAtt": [
+            "HttpEndpointsLambda",
+            "Arn"
+          ]
         },
         "Action": "lambda:InvokeFunction",
         "Principal": "apigateway.amazonaws.com",
@@ -121,7 +153,9 @@
             {
               "Effect": "Allow",
               "Principal": {
-                "Service": ["lambda.amazonaws.com"]
+                "Service": [
+                  "lambda.amazonaws.com"
+                ]
               },
               "Action": "sts:AssumeRole"
             }
@@ -135,7 +169,9 @@
               "Statement": [
                 {
                   "Effect": "Allow",
-                  "Action": ["logs:*"],
+                  "Action": [
+                    "logs:*"
+                  ],
                   "Resource": "arn:aws:logs:*:*:*"
                 }
               ]
