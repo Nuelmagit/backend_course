@@ -9,6 +9,7 @@
     "cf-package": "bash scripts/cf-package.sh",
     "predeploy": "npm run test && npm run build && npm run cf-package",
     "deploy": "bash scripts/cf-deploy.sh",
+    "serve": "npx babel-node src/adapters/express-entrypoint.js",
     "test": "npm run test:mocha && npm run test:cucumber",
     "test:cucumber:file": "cucumber-js --tags \"not @ignore\" --",
     "test:cucumber": "cucumber-js specs/*.feature --tags \"not @ignore\"",
