@@ -30,7 +30,7 @@ Create a .env file based on .env.sample file.
 DB_CONECTION="mongodb+srv://xx:xx@xx.xxx.mongodb.net/xx?retryWrites=true&w=majority" #MongoDb conenction string
 RANDOM_API_KEY=xxx-xxx-xxx-xxx-xxx  #Random API KEY
 JWT_SECERT=mysecret #String to generate JWT
-API_MAPPING=v1/operations  #Base path of the API
+API_MAPPING=v1/operations  #Base path of the API. If you change this value you must update .env file in the Frontend project
 #Mandatory JUST for local environment
 EXPRESS_PORT=3000
 #Mandatory JUST for AWS deployment
