@@ -32,8 +32,10 @@ export const loginUser = (username, password) => getUserByUsername(username)
 export const verifyToken = token => {
   if (!token) return Promise.reject("Missing Token");
   try {
-    const payload = jwt.verify(token, process.env.JWT_SECERT);
-    return Promise.resolve(payload);
+    const userInToken = jwt.verify(token, process.env.JWT_SECERT);
+
+    return getUserByUsername(userInToken.username)
+      .then(user => !user || user.status !== "active" ? Promise.reject("Inactive or Missing user") : userInToken)
   } catch (error) {
     return Promise.reject("Invalid Token");
   }
