@@ -54,6 +54,20 @@ npm run build
 npm run test
 ```
 
+### Load the test user to your database.
+Remplace "mongo-connection-string" for your database connection string in the next command and run it to add the test user to the database. The username is "test@tn.com", the password is "tn123" and the starting balance is 1000. This script is for testig purposes. Please don't use it in production environments.
+```
+DB_CONECTION="mongo-connection-string" npx babel-node scripts/init-account-state.js
+```
+
+### Load the operation types to your database.
+Remplace "mongo-connection-string" for your database connection string in the next command and run it to add the operation types to the database. All of the operation costs are 1 by default. You can change it before running the command.
+```
+DB_CONECTION="mongo-connection-string" npx babel-node scripts/init-operation-types.js
+```
+
+
+
 ### Deploy on AWS
 * Set the mongo connection string as DB_CONECTION in the .env file. [Create a free mongo instance](https://www.mongodb.com/es/atlas/database)
 * Set the random api key as RANDOM_API_KEY in the .env file. [Random API](https://api.random.org/)
