@@ -79,6 +79,7 @@ DB_CONECTION="mongo-connection-string" npx babel-node scripts/init-operation-typ
 * Set the bucket name of the bucket created in the previous step as DEPLOYMENT_BUCKET in the .env file.
 * Create a DNS with the DNS provider of your preference and set it in HTTP_API_DOMAIN_NAME in the .env file
 * Add/Create to AWS Certificate manager (AWS Console -> AWS Certificate Manager -> Certificates) a certificate that contains the host declared in HTTP_API_DOMAIN_NAME and set its ARN as CERTIFICATE_ARN in the .env file
+* Optional. you can set the var STACK_NAME to overwrite the AWS stack name. By default it is tn-operations-app
 * Your .env file will looks like
 ```
 //.env 
