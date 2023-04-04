@@ -1,8 +1,8 @@
 # tn-back
 
 ### Tested on
-Ubuntu 20.04.5 LTS
-Node: v14.21.3
+* Ubuntu 20.04.5 LTS
+* Node: v14.21.3
 
 ### Considerations.
 If you are planning to deploy to AWS. You will be required to Install AWS CLI, Configure credentials and optionally set up profiles.
