@@ -51,7 +51,7 @@ const getSearchQuery = search => {
   };
 }
 
-const sanatizeNumber = number => isNaN(number) ? 1 : Number(number);
+const sanatizeNumber = (number, defaultNumber) => isNaN(number) ? defaultNumber : Number(number);
 
 export const paginateRecords = (pathArgs, queryStringArgs, body, authData) =>
   isAuthorized(authData?.token)
@@ -62,9 +62,10 @@ export const paginateRecords = (pathArgs, queryStringArgs, body, authData) =>
           ...queryStringArgs?.search ? [getSearchQuery(queryStringArgs.search)] : []
         ]
       },
-      queryStringArgs?.page ? sanatizeNumber(queryStringArgs?.page) : 1,
+      sanatizeNumber(queryStringArgs?.page, 1),
       queryStringArgs?.sortField,
-      queryStringArgs?.sortCriteria
+      queryStringArgs?.sortCriteria,
+      sanatizeNumber(queryStringArgs?.limit, 5)
     ))
 
 export const login = (pathArgs, queryStringArgs, body) => !body.username || !body.password

@@ -1,4 +1,5 @@
 import { connect } from "./database/conection";
+import { makeError } from "../utils/make-error";
 import {
   jsonApiResponse,
   jsonApiErrorResponse
@@ -34,9 +35,10 @@ router.delete('/records/:id', (req, res) => adaptRequest(deleteOperation, req, r
 
 
 app.use(`/${process.env.API_MAPPING}`, router);
-app.get('*', (req, res) => Promise.reject(
-  makeError("NoSuchRoute", `Route not found`)
-).catch(err => jsonApiErrorResponse(err)));
+app.all('*', (req, res) => {
+  res.status(404);
+  res.send({ "message": "Not Found" });
+});
 
 
 
